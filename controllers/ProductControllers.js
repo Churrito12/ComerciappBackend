@@ -12,11 +12,10 @@ export const mostrarProductos = async (req, res) => {
     res.json({ message: error.message });
   }
 };
-
 //Mostrar un registro
 export const getProducto = async (req, res) => {
   try {
-    const producto = ProductoModel.findOne({
+    const producto = await ProductoModel.findOne({
       where: { id: req.params.id },
     });
     res.json(producto);

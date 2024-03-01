@@ -21,5 +21,5 @@ app.get("/", (req, res) => {
   res.send("Hola Mundo");
 });
 app.listen(8000, () => {
-  console.log("Servidor corriendo en http.//localhost:8000/");
+  console.log("Servidor corriendo en http://localhost:8000/");
 });
