@@ -96,3 +96,49 @@ export const actualizarPrecios = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+// export const bookProduct = async (req, res) => {
+//   try {
+//     console.log(productosStock);
+//     if (req.query.f === "unbook") {
+//       productosStock[req.params.id]++;
+//       return res.json("unbooked");
+//     } else if (req.params.id === "book") {
+//       if (productosStock[req.params.id] == 0) return res.json("Stockout");
+//       productosStock[req.params.id]--;
+//       return res.json("booked");
+//     }
+//     res.status(400).json("error");
+//   } catch (error) {
+//     res.json({ message: error.message });
+//   }
+// };
+// export const updateContent = async (req, res) => {
+//   const stock = await ProductoModel.findAll({
+//     attributes: ["id", "stock"],
+//     where: { id: producto },
+//   });
+//   console.log(quantity);
+//   await ProductoModel.update(
+//     { stock: (stock[0].dataValues.stock = quantity[producto]) },
+//     {
+//       where: { id: producto },
+//     }
+//   );
+//   if (
+//     productoMinStock[producto].stockMin >=
+//     stock[0].dataValues.stock - quantity[producto]
+//   ) {
+//     sendMail({ id: producto });
+//   }
+// };
+// export const buyProducts = async (req, res) => {
+//   try {
+//     console.log(typeof req.body);
+//     Object.keys(req.body).forEach((producto) =>
+//       updateContent(producto, req.body)
+//     );
+//     res.json("Compra realizada correctamente");
+//   } catch (error) {
+//     res.json(error.message);
+//   }
+// };
