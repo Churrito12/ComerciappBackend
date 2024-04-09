@@ -3,14 +3,16 @@ import cors from "cors";
 //Conexion a la base de datos
 import db from "./database/db.js";
 //importe el enrutador
-import routes from "./routes/routesProducts.js";
-// import ProductoModel from "./models/ProductoModel.js";
 
+import ProductoModel from "./models/ProductoModel.js";
+import routesUser from "./routes/routesUser.js";
+import routesProducts from "./routes/routesProducts.js";
 const app = express();
 
 app.use(cors());
 app.use(express.json());
-app.use("/productos", routes);
+app.use("/productos", routesProducts);
+app.use("/users", routesUser);
 
 try {
   await db.authenticate();
@@ -25,20 +27,20 @@ app.listen(8000, () => {
   console.log("Servidor corriendo en http://localhost:8000/");
 });
 
-// const productos = await ProductoModel.findAll({
-//   attributes: ["id", "stock", "stockMin", "nombre"],
-// });
-// let productoMinStock = {};
-// let productosStock = {};
+const productos = await ProductoModel.findAll({
+  attributes: ["id", "stock", "stockMin", "nombre"],
+});
+let productoMinStock = {};
+let productosStock = {};
 
-// productos.forEach((producto) => {
-//   productosStock[producto.dataValues.id] = producto.dataValues.stock;
-// });
-// productos.forEach((producto) => {
-//   productoMinStock[producto.dataValues.id] = {
-//     stockMin: producto.dataValues.stockMin,
-//     nombre: producto.dataValues.nombre,
-//   };
-// });
-// console.log(productoMinStock);
-// export { productosStock, productoMinStock };
+productos.forEach((producto) => {
+  productosStock[producto.dataValues.id] = producto.dataValues.stock;
+});
+productos.forEach((producto) => {
+  productoMinStock[producto.dataValues.id] = {
+    stockMin: producto.dataValues.stockMin,
+    nombre: producto.dataValues.nombre,
+  };
+});
+console.log(productoMinStock);
+export { productosStock, productoMinStock };

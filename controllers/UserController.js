@@ -36,3 +36,14 @@ export const actualizarUsuario = async (req, res) => {
     res.json({ message: error.message });
   }
 };
+//Se obtiene un usuario en especifico
+export const obtenerUsuario = async (req, res) => {
+  try {
+    const user = await UserModel.findAll({
+      where: { id: req.params.id },
+    });
+    res.json(user[0]);
+  } catch (error) {
+    res.json({ message: error.message });
+  }
+};

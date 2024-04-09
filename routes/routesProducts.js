@@ -8,19 +8,19 @@ import {
   getProducto,
   mostrarProductos,
   actualizarPrecios,
-  // bookProduct,
-  // buyProducts,
+  bookProduct,
+  buyProducts,
 } from "../controllers/ProductControllers.js";
 
-const router = Router();
+const routesProducts = Router();
 
-router.put("/actualizarPrecios", actualizarPrecios);
-router.get("/", mostrarProductos);
-router.get("/:id", getProducto);
-router.post("/", crearProducto);
-router.put("/:id", actualizarProducto);
-router.delete("/:id", eliminarProducto);
-// router.get("/book/:id", bookProduct);
-// router.put("comprar", buyProducts);
+routesProducts.put("/actualizarPrecios", actualizarPrecios);
+routesProducts.get("/", mostrarProductos);
+routesProducts.get("/:id", getProducto);
+routesProducts.post("/", crearProducto);
+routesProducts.put("/:id", actualizarProducto);
+routesProducts.delete("/:id", eliminarProducto);
+routesProducts.get("/book/:id", bookProduct);
+routesProducts.put("comprar", buyProducts);
 
-export default router;
+export default routesProducts;
