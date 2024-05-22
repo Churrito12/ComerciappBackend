@@ -8,7 +8,7 @@ import { MercadoPagoConfig, Preference } from "mercadopago";
 
 const client = new MercadoPagoConfig({
   accessToken:
-    "TEST-5097898960239229-050714-ff3d32fd6a431c07a116460257847cb5-721726567",
+    "TEST-7261017348869659-050818-cf9a4e855da8d02cfc11dbab6baf5d80-309670165",
 });
 
 const app = express();
@@ -27,10 +27,9 @@ try {
 app.get("/", (req, res) => {
   res.send("Holis");
 });
-app.listen(8000, () => {
-  console.log("Servidor corriendo en http://localhost:8000/");
-});
+
 app.post("/payment", async (req, res) => {
+  console.log(req, "respuesta");
   try {
     const body = {
       items: [
@@ -42,12 +41,13 @@ app.post("/payment", async (req, res) => {
         },
       ],
       back_urls: {
-        success: "http://localhost:8000/",
-        failure: "",
-        pending: "",
+        success: "http://localhost:5173/cart",
+        failure: "http://localhost:5173/cart",
+        pending: "http://localhost:5173/cart",
       },
       auto_return: "approved",
     };
+    console.log(body, "body");
     const preference = new Preference(client);
     const result = await preference.create({ body });
     res.json({
@@ -76,5 +76,7 @@ productos.forEach((producto) => {
     nombre: producto.dataValues.nombre,
   };
 });
-
+app.listen(8000, () => {
+  console.log("Servidor corriendo en http://localhost:8000/");
+});
 export { productosStock, productoMinStock };

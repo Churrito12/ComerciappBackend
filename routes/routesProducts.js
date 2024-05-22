@@ -21,6 +21,6 @@ routesProducts.post("/", crearProducto);
 routesProducts.put("/:id", actualizarProducto);
 routesProducts.delete("/:id", eliminarProducto);
 routesProducts.get("/book/:id", bookProduct);
-routesProducts.put("comprar", buyProducts);
+routesProducts.put("/comprar", buyProducts);
 
 export default routesProducts;
