@@ -4,12 +4,7 @@ import db from "./database/db.js";
 import ProductoModel from "./models/ProductoModel.js";
 import routesUser from "./routes/routesUser.js";
 import routesProducts from "./routes/routesProducts.js";
-import { MercadoPagoConfig, Preference } from "mercadopago";
-
-const client = new MercadoPagoConfig({
-  accessToken:
-    "TEST-7261017348869659-050818-cf9a4e855da8d02cfc11dbab6baf5d80-309670165",
-});
+import pay from "./routes/pay.js";
 
 const app = express();
 
@@ -17,7 +12,7 @@ app.use(cors());
 app.use(express.json());
 app.use("/productos", routesProducts);
 app.use("/users", routesUser);
-
+app.use("/pay", pay);
 try {
   await db.authenticate();
   console.log("Conexion exitosa a la base de datos");
@@ -26,39 +21,6 @@ try {
 }
 app.get("/", (req, res) => {
   res.send("Holis");
-});
-
-app.post("/payment", async (req, res) => {
-  console.log(req, "respuesta");
-  try {
-    const body = {
-      items: [
-        {
-          title: req.body.title,
-          quantity: Number(req.body.quantity),
-          unit_price: Number(req.body.price),
-          currency_id: "ARS",
-        },
-      ],
-      back_urls: {
-        success: "http://localhost:5173/cart",
-        failure: "http://localhost:5173/cart",
-        pending: "http://localhost:5173/cart",
-      },
-      auto_return: "approved",
-    };
-    console.log(body, "body");
-    const preference = new Preference(client);
-    const result = await preference.create({ body });
-    res.json({
-      id: result.id,
-    });
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({
-      error: "Error del servidor",
-    });
-  }
 });
 
 const productos = await ProductoModel.findAll({
@@ -76,7 +38,7 @@ productos.forEach((producto) => {
     nombre: producto.dataValues.nombre,
   };
 });
+export { productosStock, productoMinStock };
 app.listen(8000, () => {
   console.log("Servidor corriendo en http://localhost:8000/");
 });
-export { productosStock, productoMinStock };

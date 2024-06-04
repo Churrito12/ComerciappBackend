@@ -1,5 +1,6 @@
 //importar modelo
 import ProductoModel from "../models/ProductoModel.js";
+import { productosStock, productoMinStock } from "../app.js";
 
 //Metodos del CRUD
 
@@ -101,57 +102,68 @@ export const bookProduct = async (req, res) => {
     console.log(productosStock);
     if (req.query.f === "unbook") {
       productosStock[req.params.id]++;
-      return res.json("unbooked");
-    } else if (req.params.id === "book") {
+      return res.json("Unbooked");
+    } else if (req.query.f === "book") {
       if (productosStock[req.params.id] == 0) return res.json("Stockout");
       productosStock[req.params.id]--;
-      return res.json("booked");
+      return res.json("Booked");
     }
-    res.status(400).json("error");
+    res.status(400).json("Bad request");
   } catch (error) {
     res.json({ message: error.message });
   }
 };
-//Funcion al comprar, activa uptadecontent
+
+// Endpoint para comprar productos
 export const buyProducts = async (req, res) => {
   try {
-    console.log(typeof req.body);
-    const promises = Object.keys(req.body).map((producto) =>
+    const updatePromises = Object.keys(req.body).map((producto) =>
       updateContent(producto, req.body[producto])
     );
 
-    await Promise.all(promises);
+    await Promise.all(updatePromises);
 
-    res.json("Compra realizada correctamente");
+    res.json("Compra exitosa");
   } catch (error) {
-    console.error("Error al comprar productos:", error);
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ error: error.message });
   }
 };
 
-//Actualizar el stock
-export const updateContent = async (producto, quantity) => {
-  console.log(producto);
+//Se actualiza el contenido de la base de datos
+const updateContent = async (producto, quantity) => {
   try {
-    const stock = await ProductoModel.findAll({
+    const stock = await ProductoModel.findOne({
       attributes: ["id", "stock"],
       where: { id: producto },
     });
 
-    const newStock = stock[0].dataValues.stock - quantity;
+    if (!stock) {
+      throw new Error(`Producto con ID ${producto} no encontrado`);
+    }
+
+    const currentStock = stock.dataValues.stock;
+    const newStock = currentStock - quantity;
+
+    console.log(`Stock antes de la actualización: ${currentStock}`);
+
+    if (newStock < 0) {
+      throw new Error(`Stock insuficiente para el producto con ID ${producto}`);
+    }
 
     await ProductoModel.update(
       { stock: newStock },
-      { where: { id: producto } }
+      {
+        where: { id: producto },
+      }
     );
+
+    console.log(`Stock después de la actualización: ${newStock}`);
 
     if (productoMinStock[producto].stockMin >= newStock) {
       sendMail({ id: producto });
     }
-
-    return { message: "Stock actualizado correctamente" };
   } catch (error) {
-    console.error("Error al actualizar el stock:", error);
-    throw new Error("Error al actualizar el stock");
+    console.error(`Error actualizando el producto ${producto}:`, error.message);
+    throw error;
   }
 };
