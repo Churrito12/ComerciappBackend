@@ -14,6 +14,7 @@ import {
 
 const routesProducts = Router();
 
+routesProducts.put("/comprar", buyProducts);
 routesProducts.put("/actualizarPrecios", actualizarPrecios);
 routesProducts.get("/", mostrarProductos);
 routesProducts.get("/:id", getProducto);
@@ -21,6 +22,5 @@ routesProducts.post("/", crearProducto);
 routesProducts.put("/:id", actualizarProducto);
 routesProducts.delete("/:id", eliminarProducto);
 routesProducts.get("/book/:id", bookProduct);
-routesProducts.put("/comprar", buyProducts);
 
 export default routesProducts;

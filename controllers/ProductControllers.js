@@ -1,7 +1,22 @@
 //importar modelo
 import ProductoModel from "../models/ProductoModel.js";
-import { productosStock, productoMinStock } from "../app.js";
 
+const productos = await ProductoModel.findAll({
+  attributes: ["id", "stock", "stockMin", "nombre"],
+});
+let productoMinStock = {};
+let productosStock = {};
+
+productos.forEach((producto) => {
+  productosStock[producto.dataValues.id] = producto.dataValues.stock;
+});
+productos.forEach((producto) => {
+  productoMinStock[producto.dataValues.id] = {
+    stockMin: producto.dataValues.stockMin,
+    nombre: producto.dataValues.nombre,
+  };
+});
+export { productosStock, productoMinStock };
 //Metodos del CRUD
 
 //Mostrar todos los registros
@@ -97,11 +112,13 @@ export const actualizarPrecios = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
 export const bookProduct = async (req, res) => {
   try {
     console.log(productosStock);
     if (req.query.f === "unbook") {
       productosStock[req.params.id]++;
+      console.log(req.params.id);
       return res.json("Unbooked");
     } else if (req.query.f === "book") {
       if (productosStock[req.params.id] == 0) return res.json("Stockout");
@@ -115,55 +132,24 @@ export const bookProduct = async (req, res) => {
 };
 
 // Endpoint para comprar productos
+
 export const buyProducts = async (req, res) => {
   try {
-    const updatePromises = Object.keys(req.body).map((producto) =>
-      updateContent(producto, req.body[producto])
-    );
+    const { cartItems } = req.body; // El cuerpo de la solicitud contiene el objeto cartItems con el stock de cada producto
+    console.log("cartItems:", cartItems);
+    // Iterar sobre cada producto en el carrito
+    for (const productId in cartItems) {
+      const quantity = cartItems[productId];
 
-    await Promise.all(updatePromises);
+      // Actualizar el stock del producto en la base de datos
+      await ProductoModel.decrement(
+        { stock: quantity }, // Restar la cantidad del stock actual
+        { where: { id: productId } }
+      );
+    }
 
-    res.json("Compra exitosa");
+    res.status(200).json({ message: "Stock actualizado correctamente" });
   } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
-
-//Se actualiza el contenido de la base de datos
-const updateContent = async (producto, quantity) => {
-  try {
-    const stock = await ProductoModel.findOne({
-      attributes: ["id", "stock"],
-      where: { id: producto },
-    });
-
-    if (!stock) {
-      throw new Error(`Producto con ID ${producto} no encontrado`);
-    }
-
-    const currentStock = stock.dataValues.stock;
-    const newStock = currentStock - quantity;
-
-    console.log(`Stock antes de la actualización: ${currentStock}`);
-
-    if (newStock < 0) {
-      throw new Error(`Stock insuficiente para el producto con ID ${producto}`);
-    }
-
-    await ProductoModel.update(
-      { stock: newStock },
-      {
-        where: { id: producto },
-      }
-    );
-
-    console.log(`Stock después de la actualización: ${newStock}`);
-
-    if (productoMinStock[producto].stockMin >= newStock) {
-      sendMail({ id: producto });
-    }
-  } catch (error) {
-    console.error(`Error actualizando el producto ${producto}:`, error.message);
-    throw error;
+    res.status(500).json({ message: error.message });
   }
 };

@@ -1,7 +1,6 @@
 import express from "express";
 import cors from "cors";
 import db from "./database/db.js";
-import ProductoModel from "./models/ProductoModel.js";
 import routesUser from "./routes/routesUser.js";
 import routesProducts from "./routes/routesProducts.js";
 import pay from "./routes/pay.js";
@@ -23,22 +22,6 @@ app.get("/", (req, res) => {
   res.send("Holis");
 });
 
-const productos = await ProductoModel.findAll({
-  attributes: ["id", "stock", "stockMin", "nombre"],
-});
-let productoMinStock = {};
-let productosStock = {};
-
-productos.forEach((producto) => {
-  productosStock[producto.dataValues.id] = producto.dataValues.stock;
-});
-productos.forEach((producto) => {
-  productoMinStock[producto.dataValues.id] = {
-    stockMin: producto.dataValues.stockMin,
-    nombre: producto.dataValues.nombre,
-  };
-});
-export { productosStock, productoMinStock };
 app.listen(8000, () => {
   console.log("Servidor corriendo en http://localhost:8000/");
 });
