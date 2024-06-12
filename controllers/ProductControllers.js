@@ -112,7 +112,7 @@ export const actualizarPrecios = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-
+//Reservar productos
 export const bookProduct = async (req, res) => {
   try {
     console.log(productosStock);
@@ -131,24 +131,22 @@ export const bookProduct = async (req, res) => {
   }
 };
 
-// Endpoint para comprar productos
-
+//Comprar productos
 export const buyProducts = async (req, res) => {
   try {
-    const { cartItems } = req.body; // El cuerpo de la solicitud contiene el objeto cartItems con el stock de cada producto
+    const { cartItems } = req.body;
     console.log("cartItems:", cartItems);
-    // Iterar sobre cada producto en el carrito
+
     for (const productId in cartItems) {
       const quantity = cartItems[productId];
 
-      // Actualizar el stock del producto en la base de datos
       await ProductoModel.decrement(
-        { stock: quantity }, // Restar la cantidad del stock actual
+        { stock: quantity },
         { where: { id: productId } }
       );
     }
 
-    res.status(200).json({ message: "Stock actualizado correctamente" });
+    res.status(200).json({ message: "Stock actualizado!" });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
